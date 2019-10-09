@@ -15,6 +15,14 @@ from tbselenium.exceptions import (TBDriverConfigError, TBDriverPortError,
                                    TBDriverPathError)
 
 
+# added by Daniel: make  tbselenium open devtools with netmonitor by default
+
+from selenium.webdriver.firefox.options import Options
+
+
+
+
+
 try:
     from httplib import CannotSendRequest
 except ImportError:
@@ -50,10 +58,20 @@ class TorBrowserDriver(FirefoxDriver):
         self.export_env_vars()
         self.binary = self.get_tb_binary(logfile=tbb_logfile_path)
         self.binary.add_command_line_options('--class', '"Tor Browser"')
+
+        
+        # added by Daniel
+        self.option = Options()
+        self.option.add_argument("-devtools")
+
+
+
+
         super(TorBrowserDriver, self).__init__(firefox_profile=self.profile,
                                                firefox_binary=self.binary,
                                                capabilities=self.capabilities,
                                                timeout=cm.TB_INIT_TIMEOUT,
+                                               options=self.option,     # added by Daniel
                                                service_log_path=tbb_logfile_path)
         self.is_running = True
         sleep(1)
@@ -216,6 +234,13 @@ class TorBrowserDriver(FirefoxDriver):
         set_pref('network.proxy.socks_port', self.socks_port)
         set_pref('extensions.torbutton.socks_port', self.socks_port)
         set_pref('extensions.torlauncher.control_port', self.control_port)
+       
+
+
+        # added by Daniel
+        set_pref('devtools.toolbox.selectedTool', 'netmonitor')
+
+
         self.set_tb_prefs_for_using_system_tor(self.control_port)
         # pref_dict overwrites above preferences
         for pref_name, pref_val in pref_dict.items():
