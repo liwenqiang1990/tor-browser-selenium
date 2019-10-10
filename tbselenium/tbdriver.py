@@ -77,6 +77,7 @@ class TorBrowserDriver(FirefoxDriver):
         sleep(1)
 
     def install_extensions(self, extensions):
+        print extensions
         for extension in extensions:
             self.profile.add_extension(extension)
 
